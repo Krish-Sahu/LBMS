@@ -1,0 +1,452 @@
+import pandas as pd
+import datetime
+m = "access denied"
+student_info = " "                 #path to student_info CSV
+available_books = " "              #path to available_books CSV
+issued_books = " "                 #path to issued_books CSV
+
+
+def login():
+    global m
+    x = "username"
+    y = 1234
+    print("✻✻ Login To Get Access ✻✻")
+    print()
+    z = input("Enter Username : ")
+    print()
+    if z == x:
+        z = int(input("Enter password : "))
+        print()
+        if z == y:
+            m = "access granted"
+            print("✹ Access Granted ✹")
+            print()
+            print("✹ Enjoy Exclusive Features ✹")
+        else:
+            print("☠ Invalid password ☠")
+            print()
+            print("☠ Access Denied ☠")
+            print()
+            print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+            print()
+    else:
+        print("☠ Invalid username ☠")
+        print()
+        print("☠ Access Denied ☠")
+        print()
+        print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+        print()
+
+
+
+def issue():
+    global m
+    if m == "access granted":
+        z = int(input("Enter student Roll.no : "))
+        print()
+        my_list = []
+        df = pd.read_csv(student_info)
+        for rows in df.itertuples():
+            my_list = [rows.rollno, rows.name]
+            if my_list[0] == z:
+                name = my_list[1]
+                y = input("Enter Book Name which is to be issued : ").upper()
+                print()
+                df1 = pd.read_csv(available_books)
+                for rows in df1.itertuples():
+                    my_list = [rows.book_name, rows.available_books, rows.issued_books]
+                    if my_list[0] == y and my_list[1] == 0:
+                        print("Book Not In stock")
+                        print()
+                        break
+                    elif my_list[0] == y and my_list[1] > 0:
+                        qw = my_list[1]-1
+                        wq = my_list[2]+1
+                        df2 = pd.read_csv(issued_books)
+                        for rows in df2.itertuples():
+                            my_list = [rows.issuer, rows.bookname]
+                            if my_list[0] == z and my_list[1] == y:
+                                print("Student Has Already Issued That Book , Please Return Then Reissue")
+                                print()
+                                break
+                            else:
+                                continue
+                        else:
+                            date = datetime.datetime.now()
+                            q = date.year
+                            w = date.month
+                            e = date.day
+                            today_date = datetime.date(q, w, e)
+                            dt = datetime.timedelta(15)
+                            due_date = today_date + dt
+                            print("Book Successfully Issued to ", name, ", due date is ", due_date)
+                            print()
+                            df4 = {'issuer': z, 'bookname': y,'issuedate': today_date, 'duedate': due_date, 'fine_in_Rupees': 0}
+                            df2 = df2.append(df4, ignore_index=True)
+                            df2.to_csv(issued_books, index=False)
+                            df1 = df1[df1.book_name != y]
+                            df3 = {'book_name': y, 'available_books': qw, 'issued_books': wq}
+                            df1 = df1.append(df3, ignore_index=True)
+                            df1.to_csv(available_books, index=False)
+                        break
+                    else:
+                        continue
+                else:
+                    print("No Such Book Found In library , Please Check ☠☠")
+                    print()
+                break
+            else:
+                continue
+        else:
+            print("No such student Found, WE DONT GIVE BOOKS TO OUTSIDERS!! ☠☠")
+            print()
+
+
+
+def returnn():
+    my_list = []
+    global m
+    if m == "access granted":
+        x = int(input("Enter Student Roll No : "))
+        print()
+        df = pd.read_csv(student_info)
+        for rows in df.itertuples():
+            my_list = [rows.rollno, rows.name]
+            if my_list[0] == x:
+                y = input("Enter Book Which Is To Be Returned : ").upper()
+                print()
+                df1 = pd.read_csv(issued_books)
+                for rows in df1.itertuples():
+                    my_list = [rows.issuer, rows.bookname, rows.issuedate, rows.duedate, rows.fine_in_Rupees]
+                    if my_list[0] == x and my_list[1] == y:
+                        if my_list[4] > 0:
+                            print("☠☠ Student Has ", my_list[4], " Fine Balance ☠☠")
+                            print()
+                            print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+                            print()
+                            r = 1
+                            while r == 1:
+                                print('''Collect Fine And Enter ||  1 
+Or To Cancel Enter     ||  2''')
+                                d = input("Enter Choice : ")
+                                print()
+                                if d not in ['1', '2']:
+                                    print("Invalid Choice ☠☠")
+                                    print()
+                                elif d == '2':
+                                    print("Return Cancelled")
+                                elif d == '1':
+                                    print("Book Successfully Returned")
+                                    print()
+                                    df1 = df1[(df1.bookname != y) | (df1.issuer != x)]
+                                    df1.to_csv(issued_books, index=False)
+                                    df2 = pd.read_csv(available_books)
+                                    for rows in df2.itertuples():
+                                        my_list = [rows.book_name, rows.available_books, rows.issued_books]
+                                        if my_list[0] == y:
+                                            q = my_list[1] + 1
+                                            w = my_list[2] - 1
+                                            df2 = df2[df2.book_name != y]
+                                            df3 = {'book_name': y, 'available_books': q, 'issued_books': w}
+                                            df2 = df2.append(df3, ignore_index=True)
+                                            df2.to_csv(available_books, index=False)
+                                            r = 2
+                                            break
+                                        else:
+                                            continue
+                                else:
+                                    r = 2
+                            else:
+                                break
+                        else:
+                            print("Book Successfully Returned")
+                            print()
+                            df1 = df1[(df1.bookname != y) | (df1.issuer != x)]
+                            df1.to_csv(issued_books, index=False)
+                            df2 = pd.read_csv(available_books)
+                            for rows in df2.itertuples():
+                                my_list = [rows.book_name, rows.available_books, rows.issued_books]
+                                if my_list[0] == y:
+                                    q = my_list[1] + 1
+                                    w = my_list[2] - 1
+                                    df2 = df2[df2.book_name != y]
+                                    df3 = {'book_name': y, 'available_books': q, 'issued_books': w}
+                                    df2 = df2.append(df3, ignore_index=True)
+                                    df2.to_csv(available_books, index=False)
+                                    r = 2
+                                    break
+                            break
+                    else:
+                        continue
+
+                else:
+                    print("Student Has Not Issued That Book")
+                    print()
+                break
+            else:
+                continue
+        else:
+            print("No Such Student Found")
+            print()
+
+
+def add():
+    global m
+    my_list = []
+    print('''Do You Want To Add A New Book to Library [Enter 1] or 
+Increase The Number Of Already Existing Books [Enter 2] ''')
+    print()
+    x = input("Enter Choice : ")
+    print()
+    df = pd.read_csv(available_books)
+    if x not in ['1', '2']:
+        print("Invalid Choice ☠☠")
+        print()
+    elif x == '2':
+        y = input("Enter Name Of Book : ").upper()
+        print()
+        for rows in df.itertuples():
+            my_list = [rows.book_name, rows.available_books, rows.issued_books]
+            q = my_list[1]
+            w = my_list[2]
+            if my_list[0] == y:
+                z = int(input("Enter Number of Books To be Added : "))
+                print()
+                df = df[df.book_name != y]
+                df3 = {'book_name': y, 'available_books': q + z, 'issued_books': w}
+                df = df.append(df3, ignore_index=True)
+                df.to_csv(available_books, index=False)
+                print("Books Successfully Added")
+                print()
+                break
+            else:
+                continue
+        else:
+            print("No Such Book Found")
+            print()
+    else:
+        y = input("Enter Name Of Book : ").upper()
+        print()
+        z = int(input("Enter Number of Books To be Added : "))
+        print()
+        df3 = {'book_name': y, 'available_books': z, 'issued_books': 0}
+        df = df.append(df3, ignore_index=True)
+        df.to_csv(available_books, index=False)
+        print("Books Successfully Added")
+        print()
+
+
+
+def fine():
+    my_list = []
+    date = datetime.datetime.now()
+    q = date.year
+    w = date.month
+    e = date.day
+    df = pd.read_csv(issued_books)
+    for rows in df.itertuples():
+        my_list = [rows.issuer, rows.bookname, rows.issuedate, rows.duedate, rows.fine_in_Rupees]
+        g = my_list[0]
+        h = my_list[1]
+        t = my_list[2]
+        j = my_list[3]
+        c = int(t[0:4])
+        v = int(t[5:7])
+        b = int(t[8:10])
+        any_date = datetime.date(c, v, b)
+        today_date = datetime.date(q, w, e)
+        delta = today_date - any_date
+        x = delta.days
+        if x <= 15:
+            fees = 0
+        else:
+            fees = 10 * (x-15)
+        df = df[(df.bookname != h) | (df.issuer != g)]
+        df4 = {'issuer': g, 'bookname': h, 'issuedate': t, 'duedate': j, 'fine_in_Rupees': fees}
+        df = df.append(df4, ignore_index=True)
+        df.to_csv(issued_books, index=False)
+
+
+
+def student():
+    global m
+    if m == "access granted":
+        df = pd.read_csv(student_info)
+        print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+        print()
+        print("STUDENT TABLE")
+        print()
+        print(df)
+
+
+
+def book():
+    global m
+    if m == "access granted":
+        df = pd.read_csv(available_books)
+        print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+        print()
+        print("AVAILABLE BOOKS")
+        print()
+        print(df)
+
+
+
+def issued():
+    global m
+    if m == "access granted":
+        df = pd.read_csv(issued_books)
+        print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+        print()
+        print("ISSUED BOOKS")
+        print()
+        print(df)
+
+
+
+def studremove():
+    my_list = []
+    global m
+    if m == "access granted":
+        df = pd.read_csv(student_info)
+        x = int(input("Enter Student Rollno :  "))
+        print()
+        for rows in df.itertuples():
+            my_list = [rows.rollno, rows.name]
+            if my_list[0] == x:
+                df = df[df.rollno!= x]
+                df.to_csv(student_info, index=False)
+                print("Student Removed Successfully")
+                print()
+                break
+            else:
+                continue
+        else:
+            print("No Such Student Found ☠")
+            print()
+
+
+def studadd():
+    my_list  = []
+    global m
+    z = input("Enter Student Name : ").upper()
+    print()
+    df = pd.read_csv(student_info)
+    for rows in df.itertuples():
+        my_list = [rows.rollno, rows.name]
+        if my_list[1] == z:
+            print("Student Already Exists")
+            print()
+            break
+        else:
+            continue
+    else:
+        y = my_list[0] + 1
+        df3 = {'rollno': y, 'name': z}
+        df = df.append(df3, ignore_index=True)
+        df.to_csv(student_info, index=False)
+        print("Student Successfully Added")
+        print()
+
+
+
+i = 1
+
+
+print("*☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆**☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆*")
+print()
+print()
+print("✫✫ 𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐨 𝐋𝐢𝐛𝐫𝐚𝐫𝐲 ✫✫")
+print()
+print()
+print("*☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆**☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆*――*☆*")
+print()
+
+
+
+fine()
+
+u = 1
+while u < 4:
+    login()
+    if m == "access granted":
+        break
+    else:
+        if u == 3:
+            u = 4
+            continue
+        else:
+            print("Do you Want To Try Again Or Exit")
+            print()
+            print('''Enter 1 To Try Again
+Enter 2 To Exit''')
+            print()
+            x = input("Enter choice : ")
+            print()
+            if x not in ['1', '2']:
+                print("Invalid Choice ☠☠")
+                print()
+            elif x == '1':
+                print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+                print()
+                print("You Have ", 3 - u, " Tries Left")
+                print()
+                u += 1
+            else:
+                i = 2
+                break
+
+
+else:
+    print("Maximum Attempts Reached, Library Locked!!")
+    print()
+    i = 2
+
+
+
+while i == 1:
+    s = 1
+    print()
+    print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+    print()
+    print('''    ★.To Issue Book Enter              ➺  1
+    ★.To Return Book Enter             ➺  2
+    ★.To Add Book Enter                ➺  3
+    ★.To See Available Books Enter     ➺  4
+    ★.To view Issued Books Enter       ➺  5
+    ★.To Add Student Enter             ➺  6
+    ★.To Remove A Student Enter        ➺  7
+    ★.To View Students Enter           ➺  8
+    ★.To Exit Enter                    ➺  9''')
+    print()
+    print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+
+    print()
+    x = input("Enter Choice : ")
+    print()
+    if x not in ['1', '2', '3', '4', '5', '6', '7', '8', '9']:
+        print("Who Gave You This Choice ☠☠")
+        print()
+        print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
+        print()
+    elif x == '1':
+        issue()
+    elif x == '2':
+        returnn()
+    elif x == '3':
+        add()
+    elif x == '4':
+        book()
+    elif x == '5':
+        issued()
+    elif x == '6':
+        studadd()
+    elif x == '7':
+        studremove()
+    elif x == '8':
+        student()
+    else:
+        i = 0
+print("✫✫ Thanks For Using Our Library, See You Soon Again!! ✫✫")
+print()
+print("┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅┅")
